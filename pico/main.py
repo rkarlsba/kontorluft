@@ -14,48 +14,43 @@ office_data = {
     'unit_data': {
         'mac_address': '',
         'ip_address':  '',
-        'ip_mask':  '',
+        'ip_netmask':  '',
         'ip_gateway':  '',
         'ip_dns':  '',
+        'frequency': '',
+    },
+    'measurement_units': {
+        'temperature': 'Degrees celcius (C)',
+        'humidity': 'Percent (%)',
+        'co2_ppm': 'Parts per million (PPM)',
+        'noise': 'Decibels (dB)',
     },
     'measurements': {
-        'meteorology': {
-            'temperature': 20.2,
-            'humidity': 53.4,
-            'co2_ppm': 495.2,
-            'co_ppm': 3.2,
-        }
-        'other': {
-            'noise': 67.3,
-        }
-    }
+        'temperature': -300,
+        'humidity': -1,
+        'co2_ppm': -1,
+        'noise': -1,
+    },
     'limits': {
         'warning': {
-            'meteorology': {
-                'temperature_max': 22,
-                'temperature_min': 20,
-                'humidity_min': 20,
-                'humidity_max': 60,
-                'co2_ppm': 1000,
-                'co_ppm':  25,
-            },
-            'other': {
-                'noise': 55,
-            }
+            'temperature_max': 22,
+            'temperature_min': 20,
+            'humidity_min': 20,
+            'humidity_max': 60,
+            'co2_ppm': 1000,
+#            'co_ppm':  25,
+            'noise': 55,
+        },
         'critical': {
-            'meteorology': {
-                'temperature_max': 26,
-                'temperature_min': 19,
-                'humidity_min': 20,
-                'humidity_max': 60,
-                'co2_ppm': 1200,
-                'co_ppm': 100,
-            },
-            'other': {
-                'noise': 70,
-            }
-        }
-    }
+            'temperature_max': 26,
+            'temperature_min': 19,
+            'humidity_min': 20,
+            'humidity_max': 60,
+            'co2_ppm': 1200,
+#            'co_ppm': 100,
+            'noise': 70,
+        },
+    },
 }
 
 # Set country to avoid possible errors
@@ -69,6 +64,8 @@ wlan.active(True)
 # See the MAC address in the wireless chip OTP
 mac = ubinascii.hexlify(network.WLAN().config('mac'),':').decode()
 print('mac = ' + mac)
+office_data['unit_data']['mac_address'] = mac
+office_data['unit_data']['frequency'] = machine.freq()
 
 # Other things to query
 # print(wlan.config('channel'))
@@ -116,9 +113,12 @@ if wlan_status != 3:
     raise RuntimeError('Wi-Fi connection failed')
 else:
     print('Connected')
-    status = wlan.ifconfig()
+    status = wlan.ifconfig() #  WLAN.ifconfig([(ip, subnet, gateway, dns)])
     print('ip = ' + status[0])
-    print(status)
+    office_data['unit_data']['ip_address'] = status[0];
+    office_data['unit_data']['ip_netmask'] = status[1];
+    office_data['unit_data']['ip_gateway'] = status[2];
+    office_data['unit_data']['ip_dns'] = status[3];
 
 # Function to load in html page
 def get_html(html_name):

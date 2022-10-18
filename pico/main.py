@@ -12,9 +12,6 @@ import socket
 import json
 
 office_data = {
-    'status': {
-        'time': 0,
-    }, 
     'configuration': {
         'tcp_port': 14142,
         'listen_address': '0.0.0.0',
@@ -32,12 +29,26 @@ office_data = {
         'humidity': 'Percent (%)',
         'co2_ppm': 'Parts per million (PPM)',
         'noise': 'Decibels (dB)',
+        'time': 'Seconds since the epoch (1970-01-01 00:00:00)',
     },
     'measurements': {
-        'temperature': -300,
-        'humidity': -1,
-        'co2_ppm': -1,
-        'noise': -1,
+        'temperature': {
+            'time': 0,
+            'value': -300,
+        },
+        'humidity': {
+            'time': 0,
+            'value': -1,
+        },
+        'co2': {
+            'time': 0,
+            'value': -1,
+        },
+        'noise': {
+            'time': 0,
+            'value': -1,
+        },
+        'time': 0,
     },
     'limits': {
         'warning': {
@@ -152,7 +163,7 @@ while True:
         r = cl.recv(1024)
         # print(r)
 
-        office_data['status']['time'] = int(time.time())
+        office_data['measurements']['time'] = int(time.time())
         office_json = json.dumps(office_data) 
         r = str(r)
         cl.send('HTTP/1.0 200 OK\r\nContent-type: application/json\r\n\r\n')

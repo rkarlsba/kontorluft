@@ -75,6 +75,8 @@ office_data = {
 # Set country to avoid possible errors
 rp2.country('NO')
 
+led = machine.Pin('LED', machine.Pin.OUT)
+
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
 # If you need to disable powersaving mode
@@ -97,6 +99,7 @@ office_data['unit_data']['frequency'] = machine.freq()
 
 wlan.connect(wifi_auth['ssid'], wifi_auth['pw'])
 
+
 # Wait for connection with 10 second timeout
 timeout = 10
 while timeout > 0:
@@ -106,14 +109,35 @@ while timeout > 0:
     print('Waiting for connection...')
     time.sleep(1)
 
-# Define blinking function for onboard LED to indicate error codes
-def blink_onboard_led(num_blinks):
-    led = machine.Pin('LED', machine.Pin.OUT)
-    for i in range(num_blinks):
+def blabla(arg = "her burde det vært noe"):
+    print(arg)
+    return
+
+
+def timer_blink():
+    blink_once()
+    
+# blink
+def blink_once(on_ms=200,off_ms=200):
+    if (on_ms > 0):
+        time.sleep(on_ms/1000)
         led.on()
-        time.sleep(.2)
-        led.off()
-        time.sleep(.2)
+        if (off_ms > 0):
+            time.sleep(off_ms/1000)
+    led.off()
+
+# Define blinking function for onboard LED to indicate error codes
+def blinketiblink(num_blinks):
+    if (num_blinks<0):
+        print("Can't blink ", num_blinks, "times")
+        return
+    for i in range(num_blinks):
+        blink_once()
+
+led_status_tim = machine.Timer(-1)
+#led_status_tim.init(period=1000, mode=machine.Timer.PERIODIC, callback=timer_blink)
+led_status_tim.init(period=2000, mode=machine.Timer.PERIODIC, callback=lambda t:led.value(not led.value()))
+# led_status_tim.init(period=1000, mode=machine.Timer.PERIODIC, lambda t: led.value(not led.value()))
 
 # Handle connection error
 # Error meanings
@@ -125,8 +149,10 @@ def blink_onboard_led(num_blinks):
 # -2 Link NoNet
 # -3 Link BadAuth
 
+blabla()
+
 wlan_status = wlan.status()
-blink_onboard_led(wlan_status)
+blinketiblink(wlan_status)
 
 if wlan_status != 3:
     raise RuntimeError('Wi-Fi connection failed')
@@ -153,7 +179,6 @@ s.bind(addr)
 s.listen(1)
 
 print('Listening on', addr)
-led = machine.Pin('LED', machine.Pin.OUT)
 
 # Listen for connections
 while True:

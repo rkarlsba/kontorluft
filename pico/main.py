@@ -134,11 +134,17 @@ def blinketiblink(num_blinks):
     for i in range(num_blinks):
         blink_once()
 
-led_status_tim = machine.Timer(-1)
-#led_status_tim.init(period=1000, mode=machine.Timer.PERIODIC, callback=timer_blink)
-led_status_tim.init(period=2000, mode=machine.Timer.PERIODIC, callback=lambda t:led.value(not led.value()))
-# led_status_tim.init(period=1000, mode=machine.Timer.PERIODIC, lambda t: led.value(not led.value()))
+def les_masse_data_og_blink(t):
+    # blabla - les masse skit
+    led.on()
+    time.sleep(100/1000)
+    led.off()
+    # print('dir(', dir(t), ')')
 
+led_status_tim = machine.Timer(-1)
+led_status_tim.init(period=2000, mode=machine.Timer.PERIODIC, callback=les_masse_data_og_blink)
+
+    
 # Handle connection error
 # Error meanings
 # 0  Link Down

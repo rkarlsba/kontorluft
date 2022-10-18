@@ -6,11 +6,19 @@ import ubinascii
 import machine
 import urequests as requests
 import time
+import ntptime
 from secrets import wifi_auth
 import socket
 import json
 
 office_data = {
+    'status': {
+        'time': 0,
+    }, 
+    'configuration': {
+        'tcp_port': 14142,
+        'listen_address': '0.0.0.0',
+    },
     'unit_data': {
         'mac_address': '',
         'ip_address':  '',
@@ -120,15 +128,14 @@ else:
     office_data['unit_data']['ip_gateway'] = status[2];
     office_data['unit_data']['ip_dns'] = status[3];
 
-# Function to load in html page
-def get_html(html_name):
-    with open(html_name, 'r') as file:
-        html = file.read()
+    print("Local time before synchronization：%s" %str(time.localtime()))
+    ntptime.settime()
+    print("Local time after synchronization：%s" %str(time.localtime()))
 
-    return html
 
-# HTTP server with socket
-addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
+# TCP server with socket
+addr = socket.getaddrinfo(office_data['configuration']['listen_address'],
+                          office_data['configuration']['tcp_port'])[0][-1]
 
 s = socket.socket()
 s.bind(addr)
@@ -145,6 +152,7 @@ while True:
         r = cl.recv(1024)
         # print(r)
 
+        office_data['status']['time'] = int(time.time())
         office_json = json.dumps(office_data) 
         r = str(r)
         cl.send('HTTP/1.0 200 OK\r\nContent-type: application/json\r\n\r\n')

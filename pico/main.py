@@ -155,7 +155,7 @@ led_status_tim.init(period=2000, mode=machine.Timer.PERIODIC, callback=les_masse
 # -2 Link NoNet
 # -3 Link BadAuth
 
-blabla()
+# blabla()
 
 wlan_status = wlan.status()
 blinketiblink(wlan_status)
